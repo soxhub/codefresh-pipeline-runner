@@ -2,12 +2,14 @@
 
 # parse branch
 if [ -f $GITHUB_EVENT_PATH ]; then
+  # TODO: remove, for debugging only
+	cat $GITHUB_EVENT_PATH
 	# in case of push event
 	BRANCH=$(cat $GITHUB_EVENT_PATH | jq -r .ref | awk -F '/' '{print $3}')
 
 	if [ -z "$BRANCH" ]
     then
-    	# in case of pullresuest event
+    	# in case of pull request event
     	BRANCH=$(cat $GITHUB_EVENT_PATH | jq -r head.ref)
     fi
 else
@@ -21,5 +23,5 @@ if [ -n "$TRIGGER_NAME" ]
 then
 	codefresh run $PIPELINE_ID --trigger=$TRIGGER_NAME --branch=$BRANCH
 else
-	codefresh run $PIPELINE_ID --branch=$BRANCH
+	codefresh run $PIPELINE_ID --branch=$BRANCH 
 fi
