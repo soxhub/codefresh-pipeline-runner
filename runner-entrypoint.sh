@@ -4,6 +4,11 @@
 if [ -f $GITHUB_EVENT_PATH ]; then
   # TODO: remove, for debugging only
 	cat $GITHUB_EVENT_PATH
+
+	# repo name and organization
+	REPO_ORG=$(cat $GITHUB_EVENT_PATH | jq -r .repository.organization)
+	REPO_NAME=$(cat $GITHUB_EVENT_PATH | jq -r .repository.name)
+
 	# in case of push event
 	BRANCH=$(cat $GITHUB_EVENT_PATH | jq -r .ref | awk -F '/' '{print $3}')
 
@@ -21,7 +26,7 @@ codefresh auth use-context context
 
 if [ -n "$TRIGGER_NAME" ]
 then
-	codefresh run $PIPELINE_ID --trigger=$TRIGGER_NAME --branch=$BRANCH
+	codefresh run $PIPELINE_ID --trigger=$TRIGGER_NAME --branch=$BRANCH -v CF_REPO_OWNER=$REPO_ORG -v CF_REPO_NAME=$REPO_NAME
 else
-	codefresh run $PIPELINE_ID --branch=$BRANCH 
+	codefresh run $PIPELINE_ID --branch=$BRANCH -v CF_REPO_OWNER=$REPO_ORG -v CF_REPO_NAME=$REPO_NAME
 fi
