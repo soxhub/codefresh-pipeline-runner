@@ -19,7 +19,7 @@ codefresh auth use-contex context
 
 if [ -n "$TRIGGER_NAME" ]
 then
-	codefresh run $PIPELINE_NAME --trigger=$TRIGGER_NAME --branch=$BRANCH
+	codefresh run $PIPELINE_ID --trigger=$TRIGGER_NAME --branch=$BRANCH
 else
-	codefresh run $PIPELINE_NAME --branch=$BRANCH
+	codefresh run $PIPELINE_ID --branch=$BRANCH
 fi

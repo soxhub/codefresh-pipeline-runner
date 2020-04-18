@@ -47,14 +47,14 @@ jobs:
       - name: 'run pipeline'
         uses: codefresh-io/codefresh-pipeline-runner@v5
         env:
-          PIPELINE_NAME: 'codefresh-pipeline'
+          PIPELINE_ID: 'codefresh-pipeline'
           TRIGGER_NAME: 'codefresh-trigger'
           CF_API_KEY: ${{ secrets.GITHUB_TOKEN }}
         id: run-pipeline
 ```
 ### Env variables
 * A secret with name `CF_API_KEY` and value your Codefresh API token ( https://codefresh.io/docs/docs/integrations/codefresh-api/#authentication-instructions )
-* An environment variable called `PIPELINE_NAME` with a value of `<project_name>/<pipeline_name>`
+* An environment variable called `PIPELINE_ID` with a value of `<pipeline_id>`
 * An optional environment variable called `TRIGGER_NAME` with trigger name attached to this pipeline. See the [triggers section](https://codefresh.io/docs/docs/configure-ci-cd-pipeline/triggers/) for more information
 
 Click the Done button to save your changes and commit.

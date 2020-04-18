@@ -10,7 +10,7 @@ jobs:
       - name: 'run pipeline'
         uses:./
         env:
-          PIPELINE_NAME: 'codefresh-pipeline'
+          PIPELINE_ID: 'codefresh-pipeline'
           TRIGGER_NAME: 'codefresh-trigger'
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
         id: run-pipeline
