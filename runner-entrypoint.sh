@@ -5,14 +5,18 @@ if [ -f $GITHUB_EVENT_PATH ]; then
   # TODO: remove, for debugging only
 	cat $GITHUB_EVENT_PATH
 
-	touch /tmp/variables.yaml
+	touch /tmp/variables.json
 
 	# Codefresh system provided variables
 	# https://codefresh.io/docs/docs/codefresh-yaml/variables/#system-provided-variables
-	echo -e "- CF_REVISION=$(cat $GITHUB_EVENT_PATH | jq -r .head_commit.id)" > /tmp/variables.yaml
-	echo -e "  CF_REPO_OWNER=$(cat $GITHUB_EVENT_PATH | jq -r .repository.organization)" >> /tmp/variables.yaml
-	echo -e "  CF_REPO_NAME=$(cat $GITHUB_EVENT_PATH | jq -r .repository.name)" >> /tmp/variables.yaml
-	cat /tmp/variables.yaml
+	REVISION=$(cat $GITHUB_EVENT_PATH | jq -r .head_commit.id)
+	REPO_OWNER=$(cat $GITHUB_EVENT_PATH | jq -r .repository.organization)
+	REPO_NAME=$(cat $GITHUB_EVENT_PATH | jq -r .repository.name)
+
+	jq -n --arg revision $REVISION --arg repo_owner $REPO_OWNER --arg repo_name $REPO_NAME  \
+		'[{"CF_REVISION":"\($revision)", "CF_REPO_OWNER": "\($repo_owner)", "CF_REPO_NAME": "\($repo_name)" }]' > /tmp/variables.json
+
+	cat /tmp/variables.json
 
 	# in case of push event
 	BRANCH=$(cat $GITHUB_EVENT_PATH | jq -r .ref | awk -F '/' '{print $3}')
@@ -31,7 +35,7 @@ codefresh auth use-context context
 
 if [ -n "$TRIGGER_NAME" ]
 then
-	codefresh run $PIPELINE_ID --trigger=$TRIGGER_NAME --branch=$BRANCH --var-file=/tmp/variables.yaml
+	codefresh run $PIPELINE_ID --trigger=$TRIGGER_NAME --branch=$BRANCH --var-file=/tmp/variables.json
 else
-	codefresh run $PIPELINE_ID --branch=$BRANCH --var-file=/tmp/variables.yaml
+	codefresh run $PIPELINE_ID --branch=$BRANCH --var-file=/tmp/variables.json
 fi
