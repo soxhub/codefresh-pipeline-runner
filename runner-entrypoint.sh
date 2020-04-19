@@ -9,9 +9,9 @@ if [ -f $GITHUB_EVENT_PATH ]; then
 
 	# Codefresh system provided variables
 	# https://codefresh.io/docs/docs/codefresh-yaml/variables/#system-provided-variables
-	echo -e "- CF_REVISION=$(cat $GITHUB_EVENT_PATH | jq -r .head_commit.id)\n" > /tmp/variables.yaml
-	echo -e "  CF_REPO_OWNER=$(cat $GITHUB_EVENT_PATH | jq -r .repository.organization)\n" > /tmp/variables.yaml
-	echo -e "  CF_REPO_NAME=$(cat $GITHUB_EVENT_PATH | jq -r .repository.name)\n" > /tmp/variables.yaml
+	echo -e "- CF_REVISION=$(cat gh.json | jq -r .head_commit.id)" > /tmp/variables.yaml
+	echo -e "  CF_REPO_OWNER=$(cat gh.json | jq -r .repository.organization)" >> /tmp/variables.yaml
+	echo -e "  CF_REPO_NAME=$(cat gh.json | jq -r .repository.name)" >> /tmp/variables.yaml
 
 	# in case of push event
 	BRANCH=$(cat $GITHUB_EVENT_PATH | jq -r .ref | awk -F '/' '{print $3}')
