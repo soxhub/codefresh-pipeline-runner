@@ -19,7 +19,7 @@ if [ -f $GITHUB_EVENT_PATH ]; then
 	BRANCH=$(cat $GITHUB_EVENT_PATH | jq -r .ref | awk -F '/' '{print $3}')
 	NORMALIZED_BRANCH=$(echo $BRANCH | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9._-]/_/g')
 
-	jq -n --arg revision $REVISION --arg repo_owner $REPO_OWNER --arg repo_name $REPO_NAME  --arg norm_branch  \
+	jq -n --arg revision $REVISION --arg repo_owner $REPO_OWNER --arg repo_name $REPO_NAME  \
 		'[{"CF_REVISION":"\($revision)", "CF_REPO_OWNER": "\($repo_owner)", "CF_REPO_NAME": "\($repo_name)"}]' > /tmp/variables.json
 
 	# NOTE: there's probably a better way of doing this, but doing this to avoid super long running jq command
