@@ -13,7 +13,7 @@ if [ -f $GITHUB_EVENT_PATH ]; then
 	REPO_NAME=$(cat $GITHUB_EVENT_PATH | jq -r .repository.name)
 	
 	REVISION=$(cat $GITHUB_EVENT_PATH | jq -r .head_commit.id)
-	SHORT_REVISION=$(cat $REVISION | cut -c 2-8)
+	SHORT_REVISION=$(echo $REVISION | cut -c 2-8)
 
 	# in case of push event
 	BRANCH=$(cat $GITHUB_EVENT_PATH | jq -r .ref | awk -F '/' '{print $3}')
@@ -24,7 +24,7 @@ if [ -f $GITHUB_EVENT_PATH ]; then
 
 	# NOTE: there's probably a better way of doing this, but doing this to avoid super long running jq command
 	echo $(cat /tmp/variables.json | jq --arg norm_branch $NORMALIZED_BRANCH '[.[0] + {"CF_BRANCH_TAG_NORMALIZED": "\($norm_branch)"}]') > /tmp/variables.json
-	echo $(cat /tmp/variables.json | jq --arg short_revision $SHORT_REVISION '[.[0] + {"CF_SHORT_REVISION": "\($short_revision)"}]') > /tmp/variables.json
+	echo $(cat /tmp/variables.json | jq --arg short_revision $SHORT_REVISION '[.[0] + {"CF_SHORT_REVISION": "\($short_revisio)"}]') > /tmp/variables.json
 
 	cat /tmp/variables.json
 
