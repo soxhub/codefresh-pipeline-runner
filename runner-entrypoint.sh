@@ -9,17 +9,24 @@ if [ -f $GITHUB_EVENT_PATH ]; then
 
 	# Codefresh system provided variables
 	# https://codefresh.io/docs/docs/codefresh-yaml/variables/#system-provided-variables
-	REVISION=$(cat $GITHUB_EVENT_PATH | jq -r .head_commit.id)
 	REPO_OWNER=$(cat $GITHUB_EVENT_PATH | jq -r .repository.organization)
 	REPO_NAME=$(cat $GITHUB_EVENT_PATH | jq -r .repository.name)
-
-	jq -n --arg revision $REVISION --arg repo_owner $REPO_OWNER --arg repo_name $REPO_NAME  \
-		'[{"CF_REVISION":"\($revision)", "CF_REPO_OWNER": "\($repo_owner)", "CF_REPO_NAME": "\($repo_name)" }]' > /tmp/variables.json
-
-	cat /tmp/variables.json
+	
+	REVISION=$(cat $GITHUB_EVENT_PATH | jq -r .head_commit.id)
+	SHORT_REVISION=$(cat $REVISION | cut -c 2-8)
 
 	# in case of push event
 	BRANCH=$(cat $GITHUB_EVENT_PATH | jq -r .ref | awk -F '/' '{print $3}')
+	NORMALIZED_BRANCH=$(echo $BRANCH | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9._-]/_/g')
+
+	jq -n --arg revision $REVISION --arg repo_owner $REPO_OWNER --arg repo_name $REPO_NAME  --arg norm_branch  \
+		'[{"CF_REVISION":"\($revision)", "CF_REPO_OWNER": "\($repo_owner)", "CF_REPO_NAME": "\($repo_name)"}]' > /tmp/variables.json
+
+	# NOTE: there's probably a better way of doing this, but doing this to avoid super long running jq command
+	echo $(cat /tmp/variables.json | jq --arg norm_branch $NORMALIZED_BRANCH '[.[0] + {"CF_BRANCH_TAG_NORMALIZED": "\($norm_branch)"}]') > /tmp/variables.json
+	echo $(cat /tmp/variables.json | jq --arg short_revision $SHORT_REVISION '[.[0] + {"CF_SHORT_REVISION": "\($short_revision)"}]') > /tmp/variables.json
+
+	cat /tmp/variables.json
 
 	if [ -z "$BRANCH" ]
     then
