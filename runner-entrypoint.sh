@@ -12,6 +12,7 @@ if [ -f $GITHUB_EVENT_PATH ]; then
 	echo -e "- CF_REVISION=$(cat gh.json | jq -r .head_commit.id)" > /tmp/variables.yaml
 	echo -e "  CF_REPO_OWNER=$(cat gh.json | jq -r .repository.organization)" >> /tmp/variables.yaml
 	echo -e "  CF_REPO_NAME=$(cat gh.json | jq -r .repository.name)" >> /tmp/variables.yaml
+	cat /tmp/variables.yaml
 
 	# in case of push event
 	BRANCH=$(cat $GITHUB_EVENT_PATH | jq -r .ref | awk -F '/' '{print $3}')
