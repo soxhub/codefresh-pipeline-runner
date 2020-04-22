@@ -5,6 +5,8 @@ if [ -f $GITHUB_EVENT_PATH ]; then
   # TODO: remove, for debugging only
   cat $GITHUB_EVENT_PATH
 
+  echo $CF_API_KEY
+
   touch /tmp/variables.json
 
   # Codefresh system provided variables
