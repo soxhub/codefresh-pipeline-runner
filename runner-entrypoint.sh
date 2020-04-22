@@ -26,6 +26,12 @@ if [ -f $GITHUB_EVENT_PATH ]; then
 	echo $(cat /tmp/variables.json | jq --arg norm_branch $NORMALIZED_BRANCH '[.[0] + {"CF_BRANCH_TAG_NORMALIZED": "\($norm_branch)"}]') > /tmp/variables.json
 	echo $(cat /tmp/variables.json | jq --arg short_revision $SHORT_REVISION '[.[0] + {"CF_SHORT_REVISION": "\($short_revision)"}]') > /tmp/variables.json
 
+  # Env vars set with prefix 'CFVAR_' will be set as variables passed into codefresh with the 'CFVAR_' prefix removed
+	# i.e. CFVAR_HELM_REPO_NAME=my-helm-repo will be passed to Codefresh as HELM_REPO_NAME=my-helm-repo
+	for var in "${!CFVAR_@}"; do
+  	echo $(cat /tmp/variables.json | jq --arg key ${var#"CFVAR_"} --arg value ${!var} '[.[0] + {"\($key)": "\($value)"}]') > /tmp/variables.json
+	done
+
 	cat /tmp/variables.json
 
 	if [ -z "$BRANCH" ]
