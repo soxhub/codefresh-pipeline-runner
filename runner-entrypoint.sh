@@ -31,6 +31,8 @@ if [ -f $GITHUB_EVENT_PATH ]; then
   # Env vars set with prefix 'CFVAR_' will be set as variables passed into codefresh with the 'CFVAR_' prefix removed
   # i.e. CFVAR_HELM_REPO_NAME=my-helm-repo will be passed to Codefresh as HELM_REPO_NAME=my-helm-repo
   for var in "${!CFVAR_@}"; do
+    echo $var
+    echo ${!var}
     echo $(cat /tmp/variables.json | jq --arg key ${var#"CFVAR_"} --arg value ${!var} '[.[0] + {"\($key)": "\($value)"}]') > /tmp/variables.json
   done
 
