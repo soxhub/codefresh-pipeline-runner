@@ -9,19 +9,21 @@ if [ -f $GITHUB_EVENT_PATH ]; then
 
   touch /tmp/variables.json
 
+  # in case of push event
+  if ["$GITHUB_EVENT_NAME" == "push"]
+  then
+    BRANCH=$(echo $GITHUB_EVENT_NAME | awk -F '/' '{print $3}')
+  # in case of pull request event
+  elif ["$GITHUB_EVENT_NAME" == "pull_request"]
+    BRANCH=$GITHUB_EVENT_NAME
+  fi
+
   # Codefresh system provided variables
   # https://codefresh.io/docs/docs/codefresh-yaml/variables/#system-provided-variables
-  REPO_OWNER=$(cat $GITHUB_EVENT_PATH | jq -r .repository.organization)
-  REPO_NAME=$(cat $GITHUB_EVENT_PATH | jq -r .repository.name)
-  
-  REVISION=$(cat $GITHUB_EVENT_PATH | jq -r .head_commit.id)
-  SHORT_REVISION=$(echo $REVISION | cut -c 2-8)
-
-  # in case of push event
-  BRANCH=$(cat $GITHUB_EVENT_PATH | jq -r .ref | awk -F '/' '{print $3}')
+  SHORT_REVISION=$(echo $GITHUB_SHA | cut -c 2-8)
   NORMALIZED_BRANCH=$(echo $BRANCH | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9._-]/_/g')
 
-  jq -n --arg revision $REVISION --arg repo_owner $REPO_OWNER --arg repo_name $REPO_NAME  \
+  jq -n --arg revision $GITHUB_SHA --arg repo_owner $GITHUB_REPOSITORY_OWNER --arg repo_name ${REPO_NAME#$GITHUB_REPOSITORY_OWNER/}  \
     '[{"CF_REVISION":"\($revision)", "CF_REPO_OWNER": "\($repo_owner)", "CF_REPO_NAME": "\($repo_name)"}]' > /tmp/variables.json
 
   # NOTE: there's probably a better way of doing this, but doing this to avoid super long running jq command
@@ -35,12 +37,6 @@ if [ -f $GITHUB_EVENT_PATH ]; then
   done
 
   cat /tmp/variables.json
-
-  if [ -z "$BRANCH" ]
-    then
-      # in case of pull request event
-      BRANCH=$(cat $GITHUB_EVENT_PATH | jq -r head.ref)
-    fi
 else
   echo "Required file on path 'GITHUB_EVENT_PATH' not exists"
 fi
