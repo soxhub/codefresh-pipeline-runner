@@ -22,7 +22,7 @@ if [ -f $GITHUB_EVENT_PATH ]; then
   SHORT_REVISION=$(echo $GITHUB_SHA | cut -c 2-8)
   NORMALIZED_BRANCH=$(echo $BRANCH | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9._-]/_/g')
 
-  jq -n --arg revision $GITHUB_SHA --arg repo_owner $GITHUB_REPOSITORY_OWNER --arg repo_name ${REPO_NAME#$GITHUB_REPOSITORY_OWNER/}  \
+  jq -n --arg revision $GITHUB_SHA --arg repo_owner $GITHUB_REPOSITORY_OWNER --arg repo_name ${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}  \
     '[{"CF_REVISION":"\($revision)", "CF_REPO_OWNER": "\($repo_owner)", "CF_REPO_NAME": "\($repo_name)"}]' > /tmp/variables.json
 
   # NOTE: there's probably a better way of doing this, but doing this to avoid super long running jq command
