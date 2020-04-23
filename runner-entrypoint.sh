@@ -19,7 +19,7 @@ if [ -f $GITHUB_EVENT_PATH ]; then
 
   # Codefresh system provided variables
   # https://codefresh.io/docs/docs/codefresh-yaml/variables/#system-provided-variables
-  SHORT_REVISION=$(echo $GITHUB_SHA | cut -c 2-8)
+  SHORT_REVISION=$(echo $GITHUB_SHA | cut -c 1-7)
   NORMALIZED_BRANCH=$(echo $BRANCH | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9._-]/_/g')
 
   jq -n --arg revision $GITHUB_SHA --arg repo_owner $GITHUB_REPOSITORY_OWNER --arg repo_name ${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}  \
@@ -27,6 +27,8 @@ if [ -f $GITHUB_EVENT_PATH ]; then
 
   # NOTE: there's probably a better way of doing this, but doing this to avoid super long running jq command
   echo $(cat /tmp/variables.json | jq --arg norm_branch $NORMALIZED_BRANCH '[.[0] + {"CF_BRANCH_TAG_NORMALIZED": "\($norm_branch)"}]') > /tmp/variables.json
+  echo $NORMALIZED_BRANCH
+  cat /tmp/variables.json
   echo $(cat /tmp/variables.json | jq --arg short_revision $SHORT_REVISION '[.[0] + {"CF_SHORT_REVISION": "\($short_revision)"}]') > /tmp/variables.json
 
   # Env vars set with prefix 'CFVAR_' will be set as variables passed into codefresh with the 'CFVAR_' prefix removed
