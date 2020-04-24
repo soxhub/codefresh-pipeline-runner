@@ -15,6 +15,9 @@ if [ -f $GITHUB_EVENT_PATH ]; then
   # in case of pull request event
   elif [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
     BRANCH=$GITHUB_REF
+  # in case of release event
+  elif [ "$GITHUB_EVENT_NAME" == "release"]; then
+    RELEASE_TAG=$(echo $GITHUB_REF | awk -F '/' '{print $3}')
   fi
 
   # Codefresh system provided variables
@@ -26,10 +29,12 @@ if [ -f $GITHUB_EVENT_PATH ]; then
     '[{"CF_REVISION":"\($revision)", "CF_REPO_OWNER": "\($repo_owner)", "CF_REPO_NAME": "\($repo_name)"}]' > /tmp/variables.json
 
   # NOTE: there's probably a better way of doing this, but doing this to avoid super long running jq command
-  echo $(cat /tmp/variables.json | jq --arg norm_branch $NORMALIZED_BRANCH '[.[0] + {"CF_BRANCH_TAG_NORMALIZED": "\($norm_branch)"}]') > /tmp/variables.json
-  echo $NORMALIZED_BRANCH
-  cat /tmp/variables.json
-  echo $(cat /tmp/variables.json | jq --arg short_revision $SHORT_REVISION '[.[0] + {"CF_SHORT_REVISION": "\($short_revision)"}]') > /tmp/variables.json
+  echo $(cat /tmp/variables.json | jq --arg var $NORMALIZED_BRANCH '[.[0] + {"CF_BRANCH_TAG_NORMALIZED": "\($var)"}]') > /tmp/variables.json
+  echo $(cat /tmp/variables.json | jq --arg var $SHORT_REVISION '[.[0] + {"CF_SHORT_REVISION": "\($var)"}]') > /tmp/variables.json
+
+  if [ "$GITHUB_EVENT_NAME" == "release"]; then
+    echo $(cat /tmp/variables.json | jq --arg var $RELEASE_TAG '[.[0] + {"CF_RELEASE_TAG": "\($var)"}]') > /tmp/variables.json
+  fi
 
   # Env vars set with prefix 'CFVAR_' will be set as variables passed into codefresh with the 'CFVAR_' prefix removed
   # i.e. CFVAR_HELM_REPO_NAME=my-helm-repo will be passed to Codefresh as HELM_REPO_NAME=my-helm-repo
