@@ -16,7 +16,7 @@ if [ -f $GITHUB_EVENT_PATH ]; then
   elif [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
     BRANCH=$GITHUB_REF
   # in case of release event
-  elif [ "$GITHUB_EVENT_NAME" == "release"]; then
+  elif [ "$GITHUB_EVENT_NAME" == "release" ]; then
     RELEASE_TAG=$(echo $GITHUB_REF | awk -F '/' '{print $3}')
   fi
 
@@ -32,7 +32,7 @@ if [ -f $GITHUB_EVENT_PATH ]; then
   echo $(cat /tmp/variables.json | jq --arg var $NORMALIZED_BRANCH '[.[0] + {"CF_BRANCH_TAG_NORMALIZED": "\($var)"}]') > /tmp/variables.json
   echo $(cat /tmp/variables.json | jq --arg var $SHORT_REVISION '[.[0] + {"CF_SHORT_REVISION": "\($var)"}]') > /tmp/variables.json
 
-  if [ "$GITHUB_EVENT_NAME" == "release"]; then
+  if [ "$GITHUB_EVENT_NAME" == "release" ]; then
     echo $(cat /tmp/variables.json | jq --arg var $RELEASE_TAG '[.[0] + {"CF_RELEASE_TAG": "\($var)"}]') > /tmp/variables.json
   fi
 
