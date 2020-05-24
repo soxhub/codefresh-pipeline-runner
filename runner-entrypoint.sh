@@ -10,7 +10,7 @@ if [ -f $GITHUB_EVENT_PATH ]; then
   touch /tmp/variables.json
 
   # in case of push event
-  if [ "$GITHUB_EVENT_NAME" == "push" ]; then
+  if [ "$GITHUB_EVENT_NAME" == "push" ] || [ "$GITHUB_EVENT_NAME" = "schedule" ]; then
     BRANCH=$(echo $GITHUB_REF | awk -F '/' '{print $3}')
   # in case of pull request event
   elif [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
